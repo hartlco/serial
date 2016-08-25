@@ -7,12 +7,13 @@ import {
     TextInput,
     View,
     ActivityIndicator,
-    ListView
+    ListView,
+    AsyncStorage
 } from 'react-native';
 
 var ShowList = require('./ShowList.js');
-
-var SearchResultsPage = require('./SearchResultsPage')
+var SearchResultsPage = require('./SearchResultsPage');
+var DetailPage = require('./DetailPage.js');
 
 class MainPage extends Component {
 
@@ -27,6 +28,7 @@ class MainPage extends Component {
             storage: [],
             dataSource: MainPage.dataSource().cloneWithRows([]),
         };
+        this._loadData();
     }
 
      render() {
@@ -43,11 +45,37 @@ class MainPage extends Component {
                         clearTextOnFocus = {true}
                     />
                 </View>
-                <ShowList dataSource={this.state.dataSource} onPressBlock={this._onPress.bind()} automaticallyAdjustContentInsets={false}/>
                 <View style={styles.listContainer}>
-            </View>
+                    <ShowList dataSource={this.state.dataSource} onPressBlock={this._onPress.bind(this)} automaticallyAdjustContentInsets={false}/>
+                </View>
             </View>
         );
+    }
+
+    async _loadData() {
+        var storage;
+        try {
+            const value = await AsyncStorage.getItem('Storage');
+            if (value !== null) {
+                console.log("storage: " + value);
+                storage = JSON.parse(value);
+                var self = this;
+                self.setState({
+                    storage: storage,
+                    dataSource: MainPage.dataSource().cloneWithRows(storage)
+                });
+            }
+        } catch (error) {
+            console.log("error " + error);
+        }
+    }
+
+    async _saveData() {
+        try {
+            await AsyncStorage.setItem('Storage', JSON.stringify(this.state.storage));
+        } catch (error) {
+            console.log("Saveerror: " + error);
+        }
     }
 
     _queryURLForSearchTerm(seachTerm) {
@@ -71,6 +99,7 @@ class MainPage extends Component {
             self.setState({
                 dataSource: MainPage.dataSource().cloneWithRows(self.state.storage)
             })
+            self._saveData();
         }
         
         this.props.navigator.push({
@@ -80,8 +109,25 @@ class MainPage extends Component {
         });
     }
 
-    _onPress() {
+    _onPress(rowData) {
+        var self = this;
+        var deleteShow = function() {
+            var storage = self.state.storage;
+            self.state.storage.splice(storage.indexOf(rowData), 1);
+            self.setState({
+                dataSource: MainPage.dataSource().cloneWithRows(self.state.storage)
+            })
+            self._saveData();
+        }
 
+        this.props.navigator.push({
+            title: 'Detail',
+            component: DetailPage,
+            passProps: {
+                show: rowData,
+                deleteShowBlock: deleteShow
+            }
+        });
     }
 
     _onReturn() {
