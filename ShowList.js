@@ -15,16 +15,20 @@ import {
 class ShowList extends Component {
 
     renderRow(rowData, sectionID, rowID) {
+
+        var image = rowData.show.image !== null ? (<Image resizeMode="contain" style={styles.thumb} source= {{ uri: rowData.show.image.medium }} />) : (<View/>);
+        var summary = rowData.show.summary.replace(/<(?:.|\n)*?>/gm, '');
         return (
             <TouchableHighlight 
                 onPress={this.props.onPressBlock.bind(this, rowData)}
-                underlayColor='#dddddd'>
+                underlayColor='#516676'
+                style={styles.cell}>
                 <View>
                     <View style={styles.rowContainer}>
-                        <Image style={styles.thumb} source= {{ uri: rowData.show.image.medium }} />
+                        {image}
                         <View style={styles.textContainer}>
                             <Text style={styles.title}>{rowData.show.name}</Text>
-                            <Text style={styles.summary} numberOfLines={5}>{rowData.show.summary}</Text>
+                            <Text style={styles.summary} numberOfLines={4}>{summary}</Text>
                         </View>
                     </View>
                     <View style={styles.sparator}/>
@@ -39,6 +43,7 @@ class ShowList extends Component {
                 dataSource={this.props.dataSource} 
                 renderRow={this.renderRow.bind(this)}
                 automaticallyAdjustContentInsets={this.props.automaticallyAdjustContentInsets}
+                contentInset={{bottom: 60}}
             />
         );
     }
@@ -50,25 +55,32 @@ var styles = StyleSheet.create({
         padding:10,
         marginRight: 10
     },
+    cell: {
+        backgroundColor:'#1C2F40',
+    },
     textContainer: {
         flex: 1
     },
     sparator: {
         height: 1,
-        backgroundColor: '#dddddd'
+        backgroundColor: '#000000'
     },
     title: {
-        fontSize: 25,
+        fontSize: 20,
         fontWeight: 'bold',
-        color: '#48BBEC'
+        color: '#14F5A5',
+        paddingBottom:8
     },
     summary: {
         fontSize: 14,
-        color: '#656565'
+        color: '#DFEAF2'
     },
     rowContainer: {
         flexDirection: 'row',
-        padding: 10
+        paddingTop: 14,
+        paddingBottom:14,
+        paddingRight:10,
+        paddingLeft:10
     },
 });
 
