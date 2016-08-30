@@ -23,19 +23,45 @@ class SearchResultsPage extends Component {
         );
         this.state = {
             isLoading: true,
-            dataSource: dataSource.cloneWithRows(this.props.results)
+            dataSource: dataSource.cloneWithRows(this.props.results),
+            showAddMessage: false,
         };
     }
 
     render() {
+
+        var addMessage = this.state.showAddMessage ? (<Text style={styles.addMessage}>Added item</Text>) : (<View/>);
+
         return(
-            <ShowList dataSource={this.state.dataSource} onPressBlock={this.props.addShowBlock} automaticallyAdjustContentInsets={true}/>
+            <View style={{flex: 1, backgroundColor:'#1C2F40'}}>
+                <ShowList dataSource={this.state.dataSource} onPressBlock={this._onPress.bind(this)} automaticallyAdjustContentInsets={true}/>
+                {addMessage}
+            </View>
         );
+    }
+
+    _onPress(rowData) {
+        this.setState({showAddMessage:true});
+
+        setTimeout( () => {
+            this.setState({showAddMessage:false});
+        }, 2000);
+
+        this.props.addShowBlock(rowData);
     }
 }
 
 var styles = StyleSheet.create({
-    
+    addMessage: {
+        position: 'absolute',
+        alignItems:'center',
+        padding:10,
+        textAlign: 'center',
+        backgroundColor: '#14F5A5',
+        top:0,
+        left:0,
+        right:0,
+    },
 });
 
 module.exports = SearchResultsPage;
