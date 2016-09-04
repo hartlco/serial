@@ -9,7 +9,8 @@ import {
     ActivityIndicator,
     TouchableHighlight,
     Image,
-    ScrollView
+    ScrollView,
+    ActionSheetIOS,
 } from 'react-native';
 
 class DetailPage extends Component {
@@ -43,7 +44,7 @@ class DetailPage extends Component {
                         style={styles.shareButton} 
                         onPress={this._onPressButton}
                         underlayColor='#14F5A5'
-                        onPress={this.onDeletePress.bind(this)}>
+                        onPress={this.showShareActionSheet.bind(this)}>
                         <Text>Share</Text>
                     </TouchableHighlight>
                 </View>
@@ -54,6 +55,22 @@ class DetailPage extends Component {
     onDeletePress() {
         this.props.deleteShowBlock();
         this.props.navigator.pop();
+    }
+
+    showShareActionSheet() {
+        ActionSheetIOS.showShareActionSheetWithOptions({
+                url: this.props.detailData.show.url,
+                message: 'Look at this show',
+                subject: 'Subject',
+                excludedActivityTypes: [
+                    'com.apple.UIKit.activity.PostToTwitter'
+                ]
+            },
+            (error) => alert(error),
+            (success, method) => {
+                
+            }
+        );
     }
 }
 
